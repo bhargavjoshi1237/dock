@@ -11,7 +11,7 @@ COPY package*.json /app/
 RUN npm install
 
 # Copy the application code
-COPY..
+COPY. /app/
 
 # Build the application (if your app needs a build step, adjust accordingly)
 # For a simple Express.js app, this might not be necessary
