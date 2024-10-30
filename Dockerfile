@@ -24,8 +24,9 @@ COPY . .
 # Expose ports for the Express app and PostgreSQL
 EXPOSE 3000 5432
 
-# Start PostgreSQL and initialize the database
+# Start PostgreSQL in the background
 CMD service postgresql start && \
     sleep 5 && \
     psql -U postgres -c "CREATE DATABASE demo_db;" && \
+    tail -f /dev/null & \
     node app.js
