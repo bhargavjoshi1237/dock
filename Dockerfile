@@ -1,43 +1,29 @@
+# Stage 1: Prepare Application Code
 FROM node:14 as builder
 
-# Set working directory to /app
 WORKDIR /app
-
-# Copy package*.json to install dependencies
-COPY package*.json.
-
-# Install dependencies
+ADD package*.json.
 RUN npm install
-
-# Copy the application code (update to reference the correct directory)
-COPY../..
+ADD. /app/
 
 # Stage 2: Setup PostgreSQL and Express.js Runtime
 FROM ubuntu:20.04
 
-# Set working directory to /app
 WORKDIR /app
-
-# Install PostgreSQL and Node.js
-RUN apt-get update && \
-    apt-get install -y postgresql-13 postgresql-client-13 nodejs npm && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# Start PostgreSQL service
-RUN service postgresql start
-
-# Create PostgreSQL user and database for the app
-RUN sudo -u postgres psql -c "CREATE USER myuser WITH PASSWORD 'ypassword';"
-RUN sudo -u postgres psql -c "CREATE DATABASE mydb OWNER myuser;"
-
-# Set environment variables
 ENV POSTGRES_USER=myuser
 ENV POSTGRES_PASSWORD=mypassword
 ENV POSTGRES_DB=mydb
 ENV DATABASE_HOST=localhost
 ENV DATABASE_PORT=5432
 ENV NODE_ENV=production
+
+# Install PostgreSQL and Node.js
+RUN apt-get update && apt-get install -y postgresql-13 postgresql-client-13 nodejs npm
+RUN service postgresql start
+
+# Create PostgreSQL user and database for the app
+RUN sudo -u postgres psql -c "CREATE USER myuser WITH PASSWORD 'ypassword';"
+RUN sudo -u postgres psql -c "CREATE DATABASE mydb OWNER myuser;"
 
 # Copy only the necessary application code from the builder stage
 COPY --from=builder /app/app.js /app/
