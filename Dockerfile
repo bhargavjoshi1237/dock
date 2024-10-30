@@ -24,9 +24,9 @@ COPY . .
 # Expose ports for the Express app and PostgreSQL
 EXPOSE 3000 5432
 
-# Initialize PostgreSQL database
-RUN service postgresql start && \
-    psql --username=postgres -c "CREATE DATABASE demo_db;"
+# Start PostgreSQL and initialize the database using a shell script
+COPY init-db.sh /docker-entrypoint-initdb.d/init-db.sh
+RUN chmod +x /docker-entrypoint-initdb.d/init-db.sh
 
 # Start PostgreSQL and the Node.js server
-CMD service postgresql start && node app.js
+CMD service postgresql start && tail -f /dev/null & node app.js
