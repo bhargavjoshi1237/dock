@@ -5,12 +5,11 @@ const { Pool } = require('pg');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configure PostgreSQL connection
+// PostgreSQL connection configuration without password
 const pool = new Pool({
   user: process.env.POSTGRES_USER || 'postgres',
   host: 'localhost',
   database: process.env.POSTGRES_DB || 'demo_db',
-  password: process.env.POSTGRES_PASSWORD || 'password',
   port: 5432,
 });
 
