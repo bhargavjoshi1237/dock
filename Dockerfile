@@ -38,13 +38,13 @@ EXPOSE 3000
 
 # Run command to initialize database with demo data and then start the Express.js app
 CMD ["sh", "-c", "
-    # Wait for PostgreSQL to be available
-    while! nc -z $DATABASE_HOST $DATABASE_PORT; do sleep 0.1; done;
-    
-    # Initialize database with demo data
-    psql -U $POSTGRES_USER -d $POSTGRES_DB -h $DATABASE_HOST -c \"CREATE TABLE IF NOT EXISTS demo (id SERIAL PRIMARY KEY, name VARCHAR(255));\";
-    psql -U $POSTGRES_USER -d $POSTGRES_DB -h $DATABASE_HOST -c \"INSERT INTO demo (name) VALUES ('Demo User 1'), ('Demo User 2');\";
-    
-    # Start the Express.js application
-    node app.js
+  # Wait for PostgreSQL to be available
+  while! nc -z $DATABASE_HOST $DATABASE_PORT; do sleep 0.1; done;
+
+  # Initialize database with demo data
+  psql -U $POSTGRES_USER -d $POSTGRES_DB -h $DATABASE_HOST -c \"CREATE TABLE IF NOT EXISTS demo (id SERIAL PRIMARY KEY, name VARCHAR(255));\";
+  psql -U $POSTGRES_USER -d $POSTGRES_DB -h $DATABASE_HOST -c \"INSERT INTO demo (name) VALUES ('Demo User 1'), ('Demo User 2');\";
+
+  # Start the Express.js application
+  node app.js
 "]
