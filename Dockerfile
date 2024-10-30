@@ -1,4 +1,4 @@
-# Stage 1: Build the Express.js Application
+# Stage 1: Prepare Application Code
 FROM node:14 as builder
 
 # Set working directory to /app
@@ -13,18 +13,19 @@ RUN npm install
 # Copy the application code
 COPY. /app/
 
-# Build the application (if your app needs a build step, adjust accordingly)
-# For a simple Express.js app, this might not be necessary
-# RUN npm run build
-
 # Stage 2: Setup PostgreSQL and Express.js Runtime
 FROM ubuntu:20.04
 
 # Set working directory to /app
 WORKDIR /app
 
-# Install PostgreSQL
-RUN apt-get update && apt-get install -y postgresql-13 postgresql-client-13
+# Install PostgreSQL and Node.js
+RUN apt-get update && \
+    apt-get install -y postgresql-13 postgresql-client-13 nodejs npm && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Start PostgreSQL service
 RUN service postgresql start
 
 # Create PostgreSQL user and database for the app
@@ -39,8 +40,12 @@ ENV DATABASE_HOST=localhost
 ENV DATABASE_PORT=5432
 ENV NODE_ENV=production
 
-# Copy application code from the builder stage
-COPY --from=builder /app.
+# Copy only the necessary application code from the builder stage
+COPY --from=builder /app/app.js /app/
+COPY --from=builder /app/package*.json /app/
+
+# Reinstall dependencies (since we're in a new stage)
+RUN npm install
 
 # Expose the port
 EXPOSE 3000
@@ -53,9 +58,6 @@ CMD ["sh", "-c", "
     # Initialize database with demo data
     psql -U $POSTGRES_USER -d $POSTGRES_DB -h $DATABASE_HOST -c \"CREATE TABLE IF NOT EXISTS demo (id SERIAL PRIMARY KEY, name VARCHAR(255));\";
     psql -U $POSTGRES_USER -d $POSTGRES_DB -h $DATABASE_HOST -c \"INSERT INTO demo (name) VALUES ('Demo User 1'), ('Demo User 2');\";
-    
-    # Install Node.js (since we switched to an Ubuntu base image)
-    apt-get update && apt-get install -y nodejs npm
     
     # Start the Express.js application
     node app.js
