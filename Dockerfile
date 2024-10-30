@@ -1,17 +1,16 @@
-# Stage 1: Prepare Application Code
 FROM node:14 as builder
 
 # Set working directory to /app
 WORKDIR /app
 
 # Copy package*.json to install dependencies
-COPY package*.json /app/
+COPY package*.json.
 
 # Install dependencies
 RUN npm install
 
-# Copy the application code
-COPY. /app/
+# Copy the application code (update to reference the correct directory)
+COPY../..
 
 # Stage 2: Setup PostgreSQL and Express.js Runtime
 FROM ubuntu:20.04
