@@ -5,7 +5,7 @@ FROM node:14 as builder
 WORKDIR /app
 
 # Copy package*.json to install dependencies
-COPY package*.json./
+COPY package*.json /app/
 
 # Install dependencies
 RUN npm install
